@@ -22,7 +22,8 @@ ReentrancyGuard
 
   /* ========== STATE VARIABLES ========== */
 
-  IToken public perionToken;
+  IToken public stakingToken;
+  IToken public rewardToken;
   uint256 public periodFinish = 0;
   uint256 public rewardRate = 0;
   uint256 public rewardsDuration = 7 days;
@@ -37,10 +38,12 @@ ReentrancyGuard
 
     /* ========== CONSTRUCTOR ========== */
 
-    constructor(IToken _tokenAddress)
+    constructor(IToken _stakingAddress, IToken _rewardAddress)
     {
-        require(address(_tokenAddress) != address(0),"Token Address cannot be address 0");
-        perionToken = _tokenAddress;
+        require(address(_stakingAddress) != address(0),"Staking Token Address cannot be address 0");
+        require(address(_rewardAddress) != address(0),"Reward Token Address cannot be address 0");
+        stakingToken = _stakingAddress;
+        rewardToken = _rewardAddress;
     }
 
     /* ========== Read-Only Functions ========== */
@@ -81,7 +84,7 @@ ReentrancyGuard
         require(amount > 0, "Cannot stake 0");
         _totalStaked = _totalStaked.add(amount);
         _balances[msg.sender] = _balances[msg.sender].add(amount);
-        perionToken.transferFrom(msg.sender, address(this), amount);
+        stakingToken.transferFrom(msg.sender, address(this), amount);
         emit Staked(msg.sender, amount);
     }
 
@@ -89,7 +92,7 @@ ReentrancyGuard
         require(amount > 0, "Cannot withdraw 0");
         _totalStaked = _totalStaked.sub(amount);
         _balances[msg.sender] = _balances[msg.sender].sub(amount);
-        perionToken.transfer(msg.sender, amount);
+        stakingToken.transfer(msg.sender, amount);
         emit Withdrawn(msg.sender, amount);
     }
 
@@ -97,7 +100,7 @@ ReentrancyGuard
         uint256 reward = rewards[msg.sender];
         if (reward > 0) {
             rewards[msg.sender] = 0;
-            perionToken.transfer(msg.sender, reward);
+            rewardToken.transfer(msg.sender, reward);
             emit RewardPaid(msg.sender, reward);
         }
     }
@@ -135,7 +138,7 @@ ReentrancyGuard
         // This keeps the reward rate in the right range, preventing overflows due to
         // very high values of rewardRate in the earned and rewardsPerToken functions;
         // Reward + leftover must be less than 2^256 / 10^18 to avoid overflow.
-        uint balance = perionToken.balanceOf(address(this));
+        uint balance = rewardToken.balanceOf(address(this));
         require(rewardRate <= balance.div(rewardsDuration), "Provided reward too high");
 
         lastUpdateTime = block.timestamp;
@@ -151,5 +154,4 @@ ReentrancyGuard
     event RewardPaid(address indexed user, uint256 reward);
     event RewardsDurationUpdated(uint256 newDuration);
     event Recovered(address token, uint256 amount);
-
 }

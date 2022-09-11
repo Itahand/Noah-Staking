@@ -41,6 +41,7 @@ describe('NoahPool', () => {
     const Token = await ethers.getContractFactory('Token')
 
     noah = await Token.deploy('Noah', 'NOAH', '1000000')
+    coo = await Token.deploy('CO2', 'COO', '1000000')
 
     accounts = await ethers.getSigners()
     team = accounts[0]
@@ -53,9 +54,9 @@ describe('NoahPool', () => {
     transaction = await noah.connect(team).transfer(user2.address, tokens(3000))
     await transaction.wait()
 
-    pool = await NoahPool.deploy(noah.address)
+    pool = await NoahPool.deploy(noah.address, coo.address)
 
-    transaction = await noah.connect(team).transfer(pool.address, tokens(10000))
+    transaction = await coo.connect(team).transfer(pool.address, tokens(10000))
     await transaction.wait()
 
     transaction = await pool.connect(team).notifyRewardAmount(tokens(2000))
@@ -72,8 +73,8 @@ describe('NoahPool', () => {
       expect(await pool.owner()).to.equal(team.address)
     })
 
-    it('The contract holds noah in it', async () => {
-      expect(await noah.balanceOf(pool.address)).to.equal(tokens(10000))
+    it('The contract holds the reward token in it', async () => {
+      expect(await coo.balanceOf(pool.address)).to.equal(tokens(10000))
     })
     it('Fails when someone other than the Owner tries to set rewards', async () => {
       await expect(pool.connect(user1).notifyRewardAmount(tokens(2000))).to.be.reverted
@@ -192,12 +193,10 @@ describe('NoahPool', () => {
         transaction = await noah.connect(user1).approve(pool.address, stake)
         result = await transaction.wait()
 
-        beforeStaking = await noah.balanceOf(user1.address)
-
         // Connect user1 with the pool contract and stake amount
         transaction = await pool.connect(user1).stake(stake)
         result = await transaction.wait()
-        afterStaking = await noah.balanceOf(user1.address)
+        afterStaking = await coo.balanceOf(user1.address)
 
                 // Time speed the blockchain
                 increaseTime(614800) // more than 7 days
@@ -208,10 +207,11 @@ describe('NoahPool', () => {
         transaction = await pool.connect(user1).getReward()
         result = await transaction.wait()
 
-        final = await noah.balanceOf(user1.address)
+        final = await coo.balanceOf(user1.address)
 
         currentReward = final - afterStaking
 
+        console.log(decimals(currentReward))
         let rewardGiven = result.events[2].args.reward
       })
 
@@ -251,7 +251,7 @@ describe('NoahPool', () => {
         // Connect user1 with the pool contract and stake amount
         transaction = await pool.connect(user1).stake(stake)
         result = await transaction.wait()
-        afterStaking = await noah.balanceOf(user1.address)
+        afterStaking = await coo.balanceOf(user1.address)
 
         // Approve stake amount for user2
         transaction = await noah.connect(user2).approve(pool.address, tokens(3000))
@@ -305,7 +305,7 @@ describe('NoahPool', () => {
           // Connect user1 with the pool contract and stake amount
           transaction = await pool.connect(user1).stake(stake)
           result = await transaction.wait()
-          afterStaking = await noah.balanceOf(user1.address)
+          afterStaking = await coo.balanceOf(user1.address)
 
           // Approve stake amount for user2
           transaction = await noah.connect(user2).approve(pool.address, tokens(3000))
@@ -314,7 +314,7 @@ describe('NoahPool', () => {
           // Connect user2 with the pool contract and stake amount
           transaction = await pool.connect(user2).stake(tokens(3000))
           result = await transaction.wait()
-          let afterStaking2 = await noah.balanceOf(user2.address)
+          let afterStaking2 = await coo.balanceOf(user2.address)
 
                   // Time speed the blockchain
                   increaseTime(86400) // 1 Day
@@ -332,8 +332,8 @@ describe('NoahPool', () => {
           transaction = await pool.connect(user2).getReward()
           result2 = await transaction.wait()
 
-          final = await noah.balanceOf(user1.address)
-          let final2 = await noah.balanceOf(user2.address)
+          final = await coo.balanceOf(user1.address)
+          let final2 = await coo.balanceOf(user2.address)
 
           currentReward = final - afterStaking
           currentReward2 = final2 - afterStaking2
