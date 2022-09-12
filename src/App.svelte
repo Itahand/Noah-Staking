@@ -8,7 +8,7 @@
 
   const poolAddress = "0x625662606c5Bd61f349F8Db55306c23AC08F4EaB"; // Enviroment variable/Pool Address
   const perionAddress = "0xd88a5cCe20629c850F15534532a5BEFAD0B2Da6c"; // Enviroment variable/Perion token address
-  let amount, unstakeAmount, rewardAmount, stakedPerion, usersBalance, stakingAddress;
+  let stakeAmount, unstakeAmount, rewardAmount, stakedPerion, usersBalance, stakingAddress;
 
     /* ========== Functions ========== */
 
@@ -126,41 +126,62 @@
       <img src={svelteLogo} class="logo svelte" alt="Svelte Logo" />
     </a>
   </div>
-  <h1>Noah Staking Rewards</h1>
 
-
-  <div>
-		<button on:click={getSigner}>Connect MetaMask to Kovan</button>
-	</div>
-  <div>
-		<button on:click={queryStaked}>Fetch Staked Perion</button>
-    <h2>{stakedPerion} Perion Staked!</h2>
+  <div class="main-container">
+    <div class="heading">
+      <h1 class="heading__title">Noah Staking/COO Rewards</h1>
+      <p class="heading__credits"><a class="heading__link" target="_blank" href="https://itahandnaizir.on.fleek.co/">Part of Itahand's Web3 portfolio</a></p>
+    </div>
+    <div class="cards">
+      <div class="card card-1">
+        <div class="card__icon"><i class="fas fa-bolt"></i></div>
+        <p class="card__exit"><i class="fas fa-times"></i></p>
+        <h2 class="card__title">Total NOAH of staked</h2>
+        <p class="card__apply">
+          <input bind:value={stakeAmount} placeholder="Stake" class="setStake">
+          <a class="card__link" href="#">Stake Noah <i class="fas fa-arrow-right"></i></a>
+          <br>
+          <input bind:value={unstakeAmount} placeholder="Withdraw" class="setStake">
+          <a class="card__link" href="#"> Withdraw Noah<i class="fas fa-arrow-right"></i></a>
+        </p>
+      </div>
+      <div class="card card-2">
+        <div class="card__icon"><i class="fas fa-bolt"></i></div>
+        <p class="card__exit"><i class="fas fa-times"></i></p>
+        <h2 class="card__title">Your Noah staked balance:</h2>
+        <p class="card__apply">
+          <a class="card__link" href="#">Fetch<i class="fas fa-arrow-right"></i></a>
+        </p>
+      </div>
+      <div class="card card-3">
+        <div class="card__icon"><i class="fas fa-bolt"></i></div>
+        <p class="card__exit"><i class="fas fa-times"></i></p>
+        <h2 class="card__title">Total COO to be rewarded this period: </h2>
+      </div>
+      <div class="card card-4">
+        <div class="card__icon"><i class="fas fa-bolt"></i></div>
+        <p class="card__exit"><i class="fas fa-times"></i></p>
+        <h2 class="card__title">Reward Period Time Left: </h2>
+      </div>
+      <div class="card card-5">
+        <div class="card__icon"><i class="fas fa-bolt"></i></div>
+        <p class="card__exit"><i class="fas fa-times"></i></p>
+        <h2 class="card__title">Claim your COO rewards!</h2>
+        <p class="card__apply">
+          <a class="card__link" href="#">Claim Now<i class="fas fa-arrow-right"></i></a>
+        </p>
+      </div>
+      <div class="card card-1">
+        <div class="card__icon"><i class="fas fa-bolt"></i></div>
+        <p class="card__exit"><i class="fas fa-times"></i></p>
+        <h2 class="card__title">Set next reward period. (Owner Only) </h2>
+        <input bind:value={rewardAmount} placeholder="Rewards" class="setRewards">
+        <p class="card__apply">
+          <a on:click={() => startRewards(rewardAmount)} class="card__link" href="#">Start Rewards<i class="fas fa-arrow-right"></i></a>
+        </p>
+      </div>
+    </div>
   </div>
-  <div>
-		<button on:click={() => faucet()}>PERION Faucet</button>
-	</div>
-  <div>
-		<button on:click={userBalance}>Fetch Staked Perion on your Account</button>
-    <h2>{usersBalance} Perion Staked by address: {stakingAddress}</h2>
-  </div>
-
-  <div>
-    <input bind:value={amount} placeholder="Set amount of Perion tokens to">
-		<button on:click={() => stakeTokens(amount)}>Stake Perion Tokens</button>
-	</div>
-  <div>
-    <input bind:value={unstakeAmount} placeholder="Set amount of Perion tokens to">
-		<button on:click={() => unstakeTokens(unstakeAmount)}>Unstake Perion Tokens</button>
-	</div>
-  <div>
-    <h2>Claim your Rewards!</h2>
-		<button on:click={() => claimRewards()}>Claim earned Perion Tokens</button>
-	</div>
-
-  <div>
-    <input bind:value={rewardAmount} placeholder="Rewards">
-		<button on:click={() => startRewards(rewardAmount)}> Start rewards period with {rewardAmount} Perion</button>
-	</div>
 
 </main>
 
@@ -176,4 +197,135 @@
   .logo.svelte:hover {
     filter: drop-shadow(0 0 2em #ff3e00aa);
   }
+  /* HEADING */
+
+.heading {
+  text-align: center;
+}
+
+.heading__title {
+  font-weight: 600;
+}
+
+.heading__credits {
+  margin: 10px 0px;
+  color: #888888;
+  font-size: 25px;
+  transition: all 0.5s;
+}
+
+.heading__link {
+  text-decoration: none;
+}
+
+.heading__credits .heading__link {
+  color: inherit;
+}
+
+/* CARDS */
+
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.card {
+  margin: 20px;
+  padding: 20px;
+  width: 500px;
+  min-height: 200px;
+  display: grid;
+  grid-template-rows: 20px 50px 1fr 50px;
+  border-radius: 10px;
+  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.4);
+  transform: scale(1.01);
+}
+
+.card__link,
+.card__exit,
+.card__icon {
+  position: relative;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.card__link::after {
+  position: absolute;
+  top: 25px;
+  left: 0;
+  content: "";
+  width: 0%;
+  height: 3px;
+  background-color: rgba(255, 255, 255, 0.6);
+  transition: all 0.5s;
+}
+
+.card__link:hover::after {
+  width: 100%;
+}
+
+.card__exit {
+  grid-row: 1/2;
+  justify-self: end;
+}
+
+.card__icon {
+  grid-row: 2/3;
+  font-size: 30px;
+}
+
+.card__title {
+  grid-row: 3/4;
+  font-weight: 400;
+  color: #ffffff;
+}
+
+.card__apply {
+  grid-row: 4/5;
+  align-self: center;
+}
+
+/* CARD BACKGROUNDS */
+
+.card-1 {
+  background: radial-gradient(#1fe4f5, #3fbafe);
+}
+
+.card-2 {
+  background: radial-gradient(#fbc1cc, #fa99b2);
+}
+
+.card-3 {
+  background: radial-gradient(#76b2fe, #b69efe);
+}
+
+.card-4 {
+  background: radial-gradient(#60efbc, #58d5c9);
+}
+
+.card-5 {
+  background: radial-gradient(#f588d8, #c0a3e5);
+}
+
+.setRewards, .setStake {
+  width: 25%;
+  margin: auto;
+  text-align: center;
+  background: radial-gradient(#1fe4f5, #3fbafe);
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1600px) {
+  .cards {
+    justify-content: center;
+  }
+}
+
 </style>
