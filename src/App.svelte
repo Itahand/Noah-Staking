@@ -6,8 +6,8 @@
 
     /* ========== Variables ========== */
 
-  const poolAddress = "0x625662606c5Bd61f349F8Db55306c23AC08F4EaB"; // Enviroment variable/Pool Address
-  const perionAddress = "0xd88a5cCe20629c850F15534532a5BEFAD0B2Da6c"; // Enviroment variable/Perion token address
+  const noahPoolAddress = "0xC1478d70441fAfc8576f985aa4C6dA9bFc9D4D58"; // Enviroment variable/Pool Address
+  const noahAddress = "0x878129F7dCEA0F728B6A37F87671702B280f4FAa"; // Enviroment variable/Perion token address
   let stakeAmount, unstakeAmount, rewardAmount, stakedPerion, usersBalance, stakingAddress;
 
     /* ========== Functions ========== */
@@ -32,7 +32,7 @@
     const signer = await getSigner()
     const address = await signer.getAddress()
     stakingAddress = address
-    const poolContract = new ethers.Contract(poolAddress, Pool.abi, signer)
+    const poolContract = new ethers.Contract(noahPoolAddress, Pool.abi, signer)
     usersBalance = decimals(await poolContract.balanceOf(address))
     console.log(`Amount of staked Perion by user: ${address} is: ${usersBalance}`)
   }
@@ -43,12 +43,12 @@
     const signer = await getSigner()
 
     let abi = ["function approve(address _spender, uint256 _value) public returns (bool success)"]
-    let contract = new ethers.Contract(perionAddress, abi, signer)
-    let result = await contract.approve(poolAddress, stakeAmount)
+    let contract = new ethers.Contract(noahAddress, abi, signer)
+    let result = await contract.approve(noahPoolAddress, stakeAmount)
     console.log("Allowance approved for:", result)
 
     // Connect with Pool contract and stake allowed tokens
-		const poolContract = new ethers.Contract(poolAddress, Pool.abi, signer)
+		const poolContract = new ethers.Contract(noahPoolAddress, Pool.abi, signer)
     result = await poolContract.stake(stakeAmount)
 
 		console.log('Tokens Staked!', result)
@@ -60,7 +60,7 @@
     const signer = await getSigner()
 
     // Connect with Pool contract and unstake amount of tokens
-    const poolContract = new ethers.Contract(poolAddress, Pool.abi, signer)
+    const poolContract = new ethers.Contract(noahPoolAddress, Pool.abi, signer)
     let result = await poolContract.withdraw(unstakeAmount)
 
     console.log('Tokens Unstaked!', result)
@@ -71,7 +71,7 @@
   const signer = await getSigner()
 
   // Connect with Pool contract and claim rewards
-  const poolContract = new ethers.Contract(poolAddress, Pool.abi, signer)
+  const poolContract = new ethers.Contract(noahPoolAddress, Pool.abi, signer)
   let result = await poolContract.getReward()
 
   console.log('Rewards Claimed!', result)
@@ -82,7 +82,7 @@
   const signer = await getSigner()
   const rewardAmount = ethers.utils.parseUnits(amount.toString(), 18);
 
-  const poolContract = new ethers.Contract(poolAddress, Pool.abi, signer)
+  const poolContract = new ethers.Contract(noahPoolAddress, Pool.abi, signer)
   let result = await poolContract.notifyRewardAmount(rewardAmount)
 
   console.log(`Rewards started with: ${amount} Perion tokens!`)
@@ -90,7 +90,7 @@
 
   async function queryStaked() {
   const signer = await getSigner()
-  const poolContract = new ethers.Contract(poolAddress, Pool.abi, signer)
+  const poolContract = new ethers.Contract(noahPoolAddress, Pool.abi, signer)
   stakedPerion = decimals(await poolContract.totalStaked())
   console.log(`Amount of staked Perion is: ${stakedPerion}`)
 
@@ -105,12 +105,12 @@
     const address = await signer.getAddress()
 
     let abi = ["function approve(address _spender, uint256 _value) public returns (bool success)"]
-    let contract = new ethers.Contract(perionAddress, abi, hardhat1)
+    let contract = new ethers.Contract(noahAddress, abi, hardhat1)
     let result = await contract.approve(address, ethers.utils.parseUnits("500", 18))
     console.log("Allowance approved for:", result)
 
     abi = ["function transfer(address _to, uint256 _value) public returns (bool success)"]
-    contract = new ethers.Contract(perionAddress, abi, hardhat1)
+    contract = new ethers.Contract(noahAddress, abi, hardhat1)
     result = await contract.transfer(address, ethers.utils.parseUnits("500", 18))
     console.log("500 PERION has been sent.", result)
 
@@ -139,7 +139,7 @@
         <h2 class="card__title">Total NOAH of staked</h2>
         <p class="card__apply">
           <input bind:value={stakeAmount} placeholder="Stake" class="setStake">
-          <a class="card__link" href="#">Stake Noah <i class="fas fa-arrow-right"></i></a>
+          <a class="card__link" href="#" on:click={() => stakeTokens(stakeAmount)}>Stake Noah <i class="fas fa-arrow-right"></i></a>
           <br>
           <input bind:value={unstakeAmount} placeholder="Withdraw" class="setStake">
           <a class="card__link" href="#"> Withdraw Noah<i class="fas fa-arrow-right"></i></a>
@@ -148,15 +148,15 @@
       <div class="card card-2">
         <div class="card__icon"><i class="fas fa-bolt"></i></div>
         <p class="card__exit"><i class="fas fa-times"></i></p>
-        <h2 class="card__title">Your Noah staked balance:</h2>
+        <h2 class="card__title">Your Noah staked balance: {usersBalance}</h2>
         <p class="card__apply">
-          <a class="card__link" href="#">Fetch<i class="fas fa-arrow-right"></i></a>
+          <a class="card__link" href="#" on:click={() => userBalance()}>Fetch<i class="fas fa-arrow-right"></i></a>
         </p>
       </div>
       <div class="card card-3">
         <div class="card__icon"><i class="fas fa-bolt"></i></div>
         <p class="card__exit"><i class="fas fa-times"></i></p>
-        <h2 class="card__title">Total COO to be rewarded this period: </h2>
+        <h2 class="card__title">Total COO to be rewarded this period: 2000</h2>
       </div>
       <div class="card card-4">
         <div class="card__icon"><i class="fas fa-bolt"></i></div>
