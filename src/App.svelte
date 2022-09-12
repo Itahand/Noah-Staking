@@ -7,8 +7,8 @@
     /* ========== Variables ========== */
 
   const noahPoolAddress = "0xC1478d70441fAfc8576f985aa4C6dA9bFc9D4D58"; // Enviroment variable/Pool Address
-  const noahAddress = "0x878129F7dCEA0F728B6A37F87671702B280f4FAa"; // Enviroment variable/Perion token address
-  let stakeAmount, unstakeAmount, rewardAmount, stakedPerion, usersBalance, stakingAddress;
+  const noahAddress = "0x878129F7dCEA0F728B6A37F87671702B280f4FAa"; // Enviroment variable/NOAH token address
+  let stakeAmount, unstakeAmount, rewardAmount, stakedNoah, usersBalance, stakingAddress, rewardPeriod;
 
     /* ========== Functions ========== */
 
@@ -34,7 +34,7 @@
     stakingAddress = address
     const poolContract = new ethers.Contract(noahPoolAddress, Pool.abi, signer)
     usersBalance = decimals(await poolContract.balanceOf(address))
-    console.log(`Amount of staked Perion by user: ${address} is: ${usersBalance}`)
+    console.log(`Amount of staked NOAH by user: ${address} is: ${usersBalance}`)
   }
 
 	async function stakeTokens(amount) {
@@ -52,6 +52,9 @@
     result = await poolContract.stake(stakeAmount)
 
 		console.log('Tokens Staked!', result)
+    setTimeout(async function() {
+  await update()
+}, 10000);
 	}
 
   async function unstakeTokens(amount) {
@@ -85,14 +88,14 @@
   const poolContract = new ethers.Contract(noahPoolAddress, Pool.abi, signer)
   let result = await poolContract.notifyRewardAmount(rewardAmount)
 
-  console.log(`Rewards started with: ${amount} Perion tokens!`)
+  console.log(`Rewards started with: ${amount} NOAH tokens!`)
   }
 
   async function queryStaked() {
   const signer = await getSigner()
   const poolContract = new ethers.Contract(noahPoolAddress, Pool.abi, signer)
-  stakedPerion = decimals(await poolContract.totalStaked())
-  console.log(`Amount of staked Perion is: ${stakedPerion}`)
+  stakedNoah = decimals(await poolContract.totalStaked())
+  console.log(`Amount of staked NOAH is: ${stakedNoah}`)
 
   }
 
@@ -112,9 +115,18 @@
     abi = ["function transfer(address _to, uint256 _value) public returns (bool success)"]
     contract = new ethers.Contract(noahAddress, abi, hardhat1)
     result = await contract.transfer(address, ethers.utils.parseUnits("500", 18))
-    console.log("500 PERION has been sent.", result)
+    console.log("500 NOAH has been sent.", result)
 
   }
+
+  async function update() {
+    const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+    const poolContract = new ethers.Contract(noahPoolAddress, Pool.abi, provider)
+    rewardPeriod = decimals(await poolContract.rewardsDuration())
+    stakedNoah = decimals(await poolContract.totalStaked())
+    console.log(rewardPeriod / 604800)
+  }
+  update()
 </script>
 
 <main>
@@ -136,13 +148,13 @@
       <div class="card card-1">
         <div class="card__icon"><i class="fas fa-bolt"></i></div>
         <p class="card__exit"><i class="fas fa-times"></i></p>
-        <h2 class="card__title">Total NOAH of staked</h2>
+        <h2 class="card__title">Total staked NOAH: {stakedNoah}</h2>
         <p class="card__apply">
           <input bind:value={stakeAmount} placeholder="Stake" class="setStake">
           <a class="card__link" href="#" on:click={() => stakeTokens(stakeAmount)}>Stake Noah <i class="fas fa-arrow-right"></i></a>
           <br>
           <input bind:value={unstakeAmount} placeholder="Withdraw" class="setStake">
-          <a class="card__link" href="#"> Withdraw Noah<i class="fas fa-arrow-right"></i></a>
+          <a class="card__link" href="#" on:click={() => unstakeTokens(unstakeAmount)}> Withdraw Noah<i class="fas fa-arrow-right"></i></a>
         </p>
       </div>
       <div class="card card-2">
@@ -161,14 +173,17 @@
       <div class="card card-4">
         <div class="card__icon"><i class="fas fa-bolt"></i></div>
         <p class="card__exit"><i class="fas fa-times"></i></p>
-        <h2 class="card__title">Reward Period Time Left: </h2>
+        <h2 class="card__title">NOAH Faucet</h2>
+        <p class="card__apply">
+          <a class="card__link" href="#" on:click={() => faucet()}>Claim 500 Noah<i class="fas fa-arrow-right"></i></a>
+        </p>
       </div>
       <div class="card card-5">
         <div class="card__icon"><i class="fas fa-bolt"></i></div>
         <p class="card__exit"><i class="fas fa-times"></i></p>
         <h2 class="card__title">Claim your COO rewards!</h2>
         <p class="card__apply">
-          <a class="card__link" href="#">Claim Now<i class="fas fa-arrow-right"></i></a>
+          <a class="card__link" href="#" on:click={() => claimRewards()}>Claim Now<i class="fas fa-arrow-right"></i></a>
         </p>
       </div>
       <div class="card card-1">
